@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-import ReactExample from "./pages/ReactExample";
+//import ReactExample from "./pages/ReactExample";
+import CrystalCollector from "./pages/CrystalCollector";
 
 function App()
 {
@@ -9,7 +10,7 @@ function App()
       <Router>
         <div>
           <Switch>
-            <Route component={ReactExample} />
+            <Route component={CrystalCollector} />
           </Switch>
         </div>
       </Router>
