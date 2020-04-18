@@ -7,61 +7,68 @@ import yellowCrystalImage from '../../img/yellow-crystal.png';
 
 const CrystalCollector = (props) =>
 {
-    const [numberToWin, setNumberToWin] =     useState(0);
+    const [numberToWin, setNumberToWin] =     useState();
     const [wins, setWins] =                   useState(0);
     const [losses, setLosses] =               useState(0);
-    const [redCrystal, setRedCrystal] =       useState();
-    const [blueCrystal, setBlueCrystal] =     useState();
-    const [yellowCrystal, setYellowCrystal] = useState();
-    const [greenCrystal, setGreenCrystal] =   useState();
+    const [redCrystal, setRedCrystal] =       useState(0);
+    const [blueCrystal, setBlueCrystal] =     useState(0);
+    const [yellowCrystal, setYellowCrystal] = useState(0);
+    const [greenCrystal, setGreenCrystal] =   useState(0);
     const [totalScore, setTotalScore] =       useState(0);
-    const [isRepeated, setIsRepeated] =       useState(true);
+    const [redOpacity, setRedOpacity] =       useState(0);
+    const [blueOpacity, setBlueOpacity] =     useState(0);
+    const [yellowOpacity, setYellowOpacity] = useState(0);
+    const [greenOpacity, setGreenOpacity] =   useState(0);
+    const [timer, setTimer] =                 useState();
 
     useEffect(() =>
     {
-        setNumberToWin(targetScore(19, 121));
+        setNumberToWin(valueGenerator(19, 121));
         generateCrystalValues();
     }, []);
 
-    const targetScore = (min, max) =>
+    useEffect(() =>
     {
-        return Math.floor(Math.random() * (max - min) + min);
-    }
+        checkCrystalValues();
+    }, [redCrystal, blueCrystal, yellowCrystal, greenCrystal]);
 
-    const crystalValueGenerator = (min, max) =>
+    useEffect(() =>
+    {
+        checkScore();
+    }, [totalScore]);
+
+    const valueGenerator = (min, max) =>
     {
         return Math.floor(Math.random() * (max - min) + min);
     }
 
     const generateCrystalValues = () =>
     {
-        // while(isRepeated)
-        // {
-        //     setIsRepeated(false);
+        setRedCrystal(valueGenerator(1, 13));
+        setBlueCrystal(valueGenerator(1, 13));
+        setYellowCrystal(valueGenerator(1, 13));
+        setGreenCrystal(valueGenerator(1, 13));
+    }
 
-            setRedCrystal(crystalValueGenerator(1, 13));
-            setBlueCrystal(crystalValueGenerator(1, 13));
-            setYellowCrystal(crystalValueGenerator(1, 13));
-            setGreenCrystal(crystalValueGenerator(1, 13));
-
-        //     if(redCrystal === blueCrystal || redCrystal === greenCrystal || redCrystal === yellowCrystal)
-        //     {
-        //         setIsRepeated(true);
-        //         console.log("Duplicate1")
-        //     }
+    const checkCrystalValues = () =>
+    {
+        if(redCrystal === blueCrystal || redCrystal === greenCrystal || redCrystal === yellowCrystal)
+        {
+            generateCrystalValues();
+            console.log("Duplicate1")
+        }
                 
-        //     if(blueCrystal === yellowCrystal || blueCrystal === greenCrystal)
-        //     {
-        //         setIsRepeated(true);
-        //         console.log("Duplicate2") 
-        //     }
+        else if(blueCrystal === yellowCrystal || blueCrystal === greenCrystal)
+        {
+            generateCrystalValues();
+            console.log("Duplicate2") 
+        }
     
-        //     if(yellowCrystal === greenCrystal)
-        //     {
-        //         setIsRepeated(true);
-        //         console.log("Duplicate3") 
-        //     }
-        // }
+        else if(yellowCrystal === greenCrystal)
+        {
+            generateCrystalValues();
+            console.log("Duplicate3") 
+        }
     }
 
     const checkScore = () =>
@@ -69,7 +76,7 @@ const CrystalCollector = (props) =>
         if(totalScore === numberToWin)
         {
             setWins(wins + 1);
-            setNumberToWin(targetScore(19, 121));
+            setNumberToWin(valueGenerator(19, 121));
             generateCrystalValues();
             setTotalScore(0);
         }
@@ -77,34 +84,24 @@ const CrystalCollector = (props) =>
         else if(totalScore > numberToWin)
         {
             setLosses(losses + 1);
-            setNumberToWin(targetScore(19, 121));
+            setNumberToWin(valueGenerator(19, 121));
             generateCrystalValues();
             setTotalScore(0);
         }
     }
 
-    const redCrystalButton = () =>
+    const crystalButton = (value, setFunction) =>
     {
-        setTotalScore(totalScore + redCrystal);
-        checkScore();
-    }
+        setTotalScore(totalScore + value);
 
-    const blueCrystalButton = () =>
-    {
-        setTotalScore(totalScore + blueCrystal);
-        checkScore();
-    }
-    
-    const yellowCrystalButton = () =>
-    {
-        setTotalScore(totalScore + yellowCrystal);
-        checkScore();
-    }
+        setRedOpacity(0);
+        setBlueOpacity(0);
+        setYellowOpacity(0);
+        setGreenOpacity(0);
 
-    const greenCrystalButton = () =>
-    {
-        setTotalScore(totalScore + greenCrystal);
-        checkScore();
+        setFunction(1);
+        clearTimeout(timer);
+        setTimer(setTimeout(() => setFunction(0), 1000));
     }
 
     let content =
@@ -164,26 +161,26 @@ const CrystalCollector = (props) =>
 
             <div className="row ml-1 mr-1 pt-1 pb-1">
                 <div id="redCrystal1" className="col-md-3">
-                    <img className="img-fluid mx-auto image-stuff" src={redCrystalImage} onClick={redCrystalButton} alt="Red Crystal"></img>
-                    <div id="redCrystal2" className="text-center crystalNumber">
+                    <img className="img-fluid mx-auto image-stuff" src={redCrystalImage} onClick={() => crystalButton(redCrystal, setRedOpacity)} alt="Red Crystal"></img>
+                    <div id="redCrystal2" className="text-center crystalNumber" style={{opacity: redOpacity}}>
                         <p>{redCrystal}</p>
                     </div>
                 </div>
                 <div id="blueCrystal1" className="col-md-3">
-                    <img className="img-fluid mx-auto image-stuff" src={blueCrystalImage} onClick={blueCrystalButton} alt="Blue Crystal"></img>
-                    <div id="blueCrystal2" className="text-center crystalNumber">
+                    <img className="img-fluid mx-auto image-stuff" src={blueCrystalImage} onClick={() => crystalButton(blueCrystal, setBlueOpacity)} alt="Blue Crystal"></img>
+                    <div id="blueCrystal2" className="text-center crystalNumber" style={{opacity: blueOpacity}}>
                         <p>{blueCrystal}</p>
                     </div>
                 </div>
                 <div id="yellowCrystal1" className="col-md-3">
-                    <img className="img-fluid mx-auto image-stuff" src={yellowCrystalImage} onClick={yellowCrystalButton} alt="Yellow Crystal"></img>
-                    <div id="yellowCrystal2" className="text-center crystalNumber">
+                    <img className="img-fluid mx-auto image-stuff" src={yellowCrystalImage} onClick={() => crystalButton(yellowCrystal, setYellowOpacity)} alt="Yellow Crystal"></img>
+                    <div id="yellowCrystal2" className="text-center crystalNumber" style={{opacity: yellowOpacity}}>
                         <p>{yellowCrystal}</p>
                     </div>
                 </div>
                 <div id="greenCrystal1" className="col-md-3">
-                    <img className="img-fluid mx-auto image-stuff" src={greenCrystalImage} onClick={greenCrystalButton} alt="Green Crystal"></img>
-                    <div id="greenCrystal2" className="text-center crystalNumber">
+                    <img className="img-fluid mx-auto image-stuff" src={greenCrystalImage} onClick={() => crystalButton(greenCrystal, setGreenOpacity)} alt="Green Crystal"></img>
+                    <div id="greenCrystal2" className="text-center crystalNumber" style={{opacity: greenOpacity}}>
                         <p>{greenCrystal}</p>
                     </div>
                 </div>
